@@ -1,8 +1,4 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto&display=swap");
-*{
-  margin: 0;
-}
-
 .body {
   background: #2eaac9;
 }
@@ -17,10 +13,18 @@
   margin-bottom: 20px;
 }
 .button {
-  height: 50px;
+  height: 40px;
   width: 100px;
   background-color: aquamarine;
   border-radius: 5px;
   border-color: #2eaac9;
+  margin: 5px;
+}
+
+.input {
+  height: 30px;
+  width: 200px;
+  border-radius: 5px;
+  border-color: #7fa9af;
   margin: 5px;
 }
