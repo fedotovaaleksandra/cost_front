@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto&display=swap");
-.body {
-  background: #2eaac9;
+body {
+  background: #b7f5f7;
 }
 
 .container {
@@ -27,4 +27,17 @@
   border-radius: 5px;
   border-color: #7fa9af;
   margin: 5px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-content: space-around;
+  flex-wrap: wrap;
+}
+
+.user {
+  height: 100px;
+  width: 100px;
+  
 }
