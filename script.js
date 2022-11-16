@@ -27,17 +27,17 @@ const render = () => {
     const { name, sum, date, _id } = item;
     const container = document.createElement("li");
     container.id = `cost-${_id}`;
-    container.className = "container";
+    container.className = "cost-container";
     
     if (_id === activeEdit) {
       const inputTask = document.createElement("input");
       inputTask.type = "text";
-      inputTask.value = storeName;
+      inputTask.value = name;
       container.appendChild(inputTask);
 
       const inputCosts = document.createElement("input");
       inputCosts.type = "number";
-      inputCosts.value = "count";
+      inputCosts.value = sum;
       container.appendChild(inputCosts);
       const inputDate = document.createElement("input");
       inputDate.type = "date";
@@ -51,7 +51,7 @@ const render = () => {
       const buttonDone = document.createElement("button");
       buttonDone.onclick = () => {
         activeEdit = null;
-        doneEdit(_id, inputTask.value, inputCosts.value, inputDate.value);
+        doneEditCost(_id, inputTask.value, inputCosts.value, inputDate.value);
       };
 
       buttonDone.appendChild(imageDone);
@@ -73,7 +73,7 @@ const render = () => {
       dateBuy.innerText = moment(date).format("DD.MM.YYYY");
 
       const expenses = document.createElement("p");
-      expenses.innerText = toString(sum) + " p.";
+      expenses.innerText = `${sum} p.`;
 
       container.appendChild(text);
       container.appendChild(dateBuy);
@@ -110,8 +110,8 @@ const render = () => {
     return;
   }
 
-  const countingSummary = allCosts.reduce((sum, currentValue) => {
-    return sum + currentValue.count;
+  const countingSummary = allCosts.reduce((summary, currentValue) => {
+    return summary + currentValue.sum;
   }, 0);
   all.innerText = `Итого: ${countingSummary} p.`;
 };
@@ -123,59 +123,70 @@ const getCost = async () => {
     });
     const result = await response.json();
     allCosts = result;
-    console.log(allCosts);
     render();
   } catch(err) {
     alert("Ошибка вывода расходов");
   }
 };
 
-const addNewTask = async () => {
+const addNewCost = async () => {
   try {
+    const count = document.getElementById("input-cost");
+    const input = document.getElementById("input-shop");
+
     const response = await fetch(host, {
       method: "POST",
-      body: JSON.stringify({ name: input.value, sum: input.value }),
+      headers,
+      body: JSON.stringify(
+        { 
+          name: input.value, 
+          sum: count.value 
+        }
+      ),
     });
     const result = await response.json();
     allCosts.push(result);
     input.value = "";
+    count.value = "";
     render();
   } catch(err) {
-    alert("ошибка добавления затрат");
+    alert(err);
   }
 };
 
-const onDeleteCost = async (_id) => {
+const deleteOneCost = async (_id) => {
   try {
     const response = await fetch(`${host}/${_id}`, {
       method: "DELETE",
     });
     
-    const resume = await response.json();
-    if (resume.deletedCount !== 1) {
-      alert("ошибка удаления");
-      return;
-    }
-    allCosts = allCosts.filter((item) => _id !== item._id);
+    const result = await response.json();
+    if (result.deletedCount === 1) {
+    allCosts = allCosts.filter(item => _id !== item._id);
     render();
+    } 
   } catch(err) {
     alert("ошибка удаления")
   }
 };
 
-const doneEditCost = async (_id, textCost, sumCost) => {
+const doneEditCost = async (_id, nameShop, sumCost, date) => {
   try {
     const response = await fetch(`${host}/name/${_id}`, {
       method: "PATCH",
+      headers,
       body: JSON.stringify({
-        name: textCost,
-        sum: sumCost
+        name: nameShop,
+        date: date,
+        sum: sumCost,
       }),
     });
     const result = await response.json();
-    allCosts.forEach(elem => {
+    allCosts.find(elem => {
       if (result._id === elem._id) {
-        elem.text = result.text;
+        elem.name = result.name;
+        elem.date = result.date;
+        elem.sum = result.sum;
       }
     });
     render();
@@ -183,10 +194,4 @@ const doneEditCost = async (_id, textCost, sumCost) => {
     alert("ошибонька")
   }
 };
-// const editCost = (_id, name, sum) => {
-//   const editedCost = document.getElementById(`textCost-${_id}, textCost-${name}, sumCost-${sum}`);
-//   if (!editedCost) {
-//     return;
-//   }
-  
-// }
+
